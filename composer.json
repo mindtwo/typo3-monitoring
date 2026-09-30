@@ -1,0 +1,77 @@
+{
+    "name": "mindtwo/typo3-monitoring",
+    "description": "TYPO3 extension of the mindtwo monitoring suite: CMS-specific collectors, console/scheduler push and a signed pull endpoint on top of mindtwo/base-monitoring.",
+    "keywords": [
+        "mindtwo",
+        "typo3",
+        "typo3-extension",
+        "monitoring",
+        "infrastructure",
+        "security"
+    ],
+    "homepage": "https://github.com/mindtwo/typo3-monitoring",
+    "license": "MIT",
+    "type": "typo3-cms-extension",
+    "authors": [
+        {
+            "name": "mindtwo GmbH",
+            "email": "info@mindtwo.de",
+            "homepage": "https://www.mindtwo.de",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "ext-json": "*",
+        "mindtwo/base-monitoring": "^1.1",
+        "psr/http-message": "^1.1 || ^2.0",
+        "psr/http-server-handler": "^1.0",
+        "psr/http-server-middleware": "^1.0",
+        "symfony/console": "^6.4 || ^7.0",
+        "typo3/cms-core": "^12.4 || ^13.4"
+    },
+    "require-dev": {
+        "laravel/pint": "^1.13",
+        "pestphp/pest": "^2.34|^3.0|^4.0",
+        "phpstan/phpstan": "^1.11|^2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Mindtwo\\Monitoring\\Typo3\\": "Classes/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Mindtwo\\Monitoring\\Typo3\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "analyse": "vendor/bin/phpstan analyse",
+        "format": "vendor/bin/pint",
+        "lint": "vendor/bin/pint --test",
+        "test": "vendor/bin/pest",
+        "check": [
+            "@lint",
+            "@analyse",
+            "@test"
+        ]
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "typo3/class-alias-loader": false,
+            "typo3/cms-composer-installers": false
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "1.x-dev"
+        },
+        "typo3/cms": {
+            "extension-key": "mindtwo_monitoring"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
