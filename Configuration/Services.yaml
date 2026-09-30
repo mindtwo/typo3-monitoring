@@ -1,0 +1,46 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+
+  Mindtwo\Monitoring\Typo3\:
+    resource: '../Classes/*'
+    exclude:
+      # Built by MonitorFactory or the middleware, never by the container.
+      - '../Classes/Collectors/*'
+      - '../Classes/Http/PullEndpoint.php'
+      - '../Classes/MonitorFactory.php'
+      # Static helpers with private constructors.
+      - '../Classes/Support/SnapshotSummary.php'
+      - '../Classes/Support/EnvironmentName.php'
+      - '../Classes/Support/DatabaseDriver.php'
+      - '../Classes/Support/ExtensionVersion.php'
+
+  # The seam interface resolves to the guarded native implementation.
+  Mindtwo\Monitoring\Typo3\Support\Typo3Api:
+    alias: Mindtwo\Monitoring\Typo3\Support\NativeTypo3Api
+
+  # Recurring: `vendor/bin/typo3 monitoring:push` from cron, or the scheduler's
+  # "Execute console commands" task.
+  Mindtwo\Monitoring\Typo3\Command\PushCommand:
+    tags:
+      - name: console.command
+        command: 'monitoring:push'
+        description: 'Build a monitoring snapshot and push it to the configured endpoint.'
+        schedulable: true
+
+  # Diagnostic commands, kept out of the scheduler's task list.
+  Mindtwo\Monitoring\Typo3\Command\ShowCommand:
+    tags:
+      - name: console.command
+        command: 'monitoring:show'
+        description: 'Collect and display the monitoring snapshot for this installation.'
+        schedulable: false
+
+  Mindtwo\Monitoring\Typo3\Command\CollectorsCommand:
+    tags:
+      - name: console.command
+        command: 'monitoring:collectors'
+        description: 'List the registered monitoring collectors and whether they are supported here.'
+        schedulable: false
