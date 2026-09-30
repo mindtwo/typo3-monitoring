@@ -38,6 +38,9 @@ final class NativeTypo3Api implements Typo3Api
 
     private bool $cacheResolved = false;
 
+    /** @var array<string, mixed>|null */
+    private ?array $settings = null;
+
     public function __construct(
         private Typo3Version $typo3Version,
         private PackageManager $packages,
@@ -162,17 +165,26 @@ final class NativeTypo3Api implements Typo3Api
         return is_scalar($value) ? (string) $value : null;
     }
 
+    /**
+     * Memoised per instance: ExtensionConfiguration::get() synchronises every
+     * extension's template into settings.php when this extension is not
+     * configured yet, so it must not run once per setting lookup.
+     */
     public function settings(): array
     {
+        if ($this->settings !== null) {
+            return $this->settings;
+        }
+
         try {
             $settings = $this->extensionConfiguration->get(self::EXTENSION_KEY);
         } catch (Throwable) {
             // Not configured yet (extension freshly installed) or the
             // configuration is unavailable in this phase — fall back to env.
-            return [];
+            $settings = [];
         }
 
-        return is_array($settings) ? $settings : [];
+        return $this->settings = is_array($settings) ? $settings : [];
     }
 
     public function cacheGet(string $key): mixed

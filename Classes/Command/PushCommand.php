@@ -47,7 +47,7 @@ final class PushCommand extends Command
         if (! $this->config->enabled()) {
             // The per-environment kill switch: a scheduler task is identical on
             // every stage, so a disabled stage must stay green and quiet.
-            $output->writeln('Monitoring is disabled (MONITORING_ENABLED = 0) — nothing pushed.');
+            $output->writeln('Monitoring is disabled (enabled = 0 in the extension configuration or MONITORING_ENABLED) — nothing pushed.');
 
             return Command::SUCCESS;
         }
