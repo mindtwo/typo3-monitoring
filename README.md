@@ -29,8 +29,12 @@ composer require mindtwo/typo3-monitoring
 vendor/bin/typo3 cache:flush
 ```
 
-The extension is active as soon as Composer installs it. It creates no database tables, so
-`extension:setup` is not required and removal leaves nothing behind.
+The extension is active as soon as Composer installs it. It creates no database tables, and
+removal leaves nothing behind. Run `vendor/bin/typo3 extension:setup` in your deploy step
+anyway: TYPO3 writes the extension's (empty) configuration defaults into
+`config/system/settings.php` on first access, and that belongs in the deploy, not in the first
+request or the first scheduler run. If `settings.php` is versioned, commit the resulting
+`mindtwo_monitoring` block.
 
 Configure the credentials in the environment (`.env` via phpdotenv, the web server, or the
 hosting panel):
@@ -119,12 +123,14 @@ X-Monitoring-Signature: hex( hmac_sha256( "<timestamp>.<raw request body>", secr
 
 The client IP is taken from TYPO3's normalized request, so `SYS/reverseProxyIP` (plus
 `reverseProxyHeaderMultiValue`) applies behind a proxy or load balancer. The endpoint path is
-matched exactly; installations served from a sub-directory are not supported.
+matched exactly (a trailing slash is tolerated); installations served from a sub-directory are
+not supported.
 
 Throttle counters and the cached snapshot live in the `mindtwo_monitoring` cache (a
-`FileBackend` without groups, registered in `ext_localconf.php` with `??=`). On multi-node
-hosting override it in `config/system/additional.php` with a shared backend such as
-`RedisBackend`.
+`FileBackend` without groups, registered in `ext_localconf.php` with `??=`). A plain
+`cache:flush` empties it too, which resets the throttle window and drops the cached snapshot —
+harmless, and on deploy even desirable. On multi-node hosting override it in
+`config/system/additional.php` with a shared backend such as `RedisBackend`.
 
 ## Architecture note
 

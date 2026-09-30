@@ -5,6 +5,23 @@ All notable changes to `mindtwo/typo3-monitoring` will be documented in this fil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.0.1 - 2026-09-30
+
+### Fixed
+
+- The extension configuration is read once per process: `ExtensionConfiguration::get()`
+  synchronises every extension template into `settings.php` while the extension is not yet
+  configured, and that ran once per setting lookup.
+- CI now tests released TYPO3 12.4 tags instead of silently resolving to `12.4.x-dev`: every
+  12.4 release carries Packagist security advisories, which Composer blocks by default.
+
+### Changed
+
+- README: recommend `extension:setup` in the deploy step, document the tolerated trailing slash
+  and the effect of `cache:flush` on the throttle window; clearer `monitoring:push` message when
+  monitoring is disabled.
+- Added a unit test for the PSR-15 middleware (pass-through, 401/405 JSON, client IP source).
+
 ## 1.0.0 - 2026-09-30
 
 Initial release.
