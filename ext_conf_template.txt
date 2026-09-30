@@ -1,0 +1,47 @@
+# mindtwo Monitoring — non-secret settings only.
+#
+# The project key and the secret are read from the environment (MONITORING_PROJECT_KEY,
+# MONITORING_SECRET) and are deliberately not configurable here: settings.php is versioned and
+# deployed to every stage, and the extension configuration form has no password field.
+#
+# Every field is empty by default. Empty = inherit the matching MONITORING_* environment
+# variable, then the built-in default. TYPO3 writes template defaults into settings.php, so a
+# non-empty default here would permanently shadow the environment.
+#
+# Every subcategory must be registered with customsubcategory, otherwise TYPO3 13 files it under
+# "Other", where entries with the same sorting number overwrite each other.
+
+# customcategory=push=Push
+# customcategory=pull=Pull endpoint
+
+# customsubcategory=general=General
+# customsubcategory=delivery=Delivery
+# customsubcategory=access=Access
+# customsubcategory=throttling=Throttling and caching
+
+# cat=push/general/10; type=options[Inherit (environment or default)=,Enabled=1,Disabled=0]; label=Monitoring enabled: Master switch for push and pull. Inherit = MONITORING_ENABLED, default enabled.
+enabled =
+
+# cat=push/general/20; type=string; label=Environment name: Overrides the name derived from TYPO3_CONTEXT (Production = production, Production/Staging = staging, Development = development). Inherit = MONITORING_ENVIRONMENT.
+environment =
+
+# cat=push/delivery/10; type=string; label=Endpoint URL: Where snapshots are pushed. Inherit = MONITORING_ENDPOINT, default https://monitoring.mindtwo.com/api/monitoring.
+endpoint =
+
+# cat=push/delivery/20; type=string; label=Push timeout (seconds): HTTP timeout of the push request. Inherit = MONITORING_TIMEOUT, default 15.
+timeout =
+
+# cat=pull/access/10; type=options[Inherit (environment or default)=,Enabled=1,Disabled=0]; label=Pull endpoint enabled: Answers GET /api/m2-monitoring. Inherit = MONITORING_ROUTE_ENABLED, default enabled.
+routeEnabled =
+
+# cat=pull/access/20; type=string; label=IP allow-list: Comma-separated IPs or CIDR ranges allowed to call the pull endpoint, empty = any. Inherit = MONITORING_IP_ALLOW_LIST.
+ipAllowList =
+
+# cat=pull/throttling/10; type=string; label=Snapshot cache (seconds): How long a pulled snapshot is reused, 0 disables. Inherit = MONITORING_ROUTE_CACHE, default 300.
+cacheSeconds =
+
+# cat=pull/throttling/20; type=string; label=Rate limit (requests per minute and IP): Inherit = MONITORING_RATE_LIMIT, default 10.
+rateLimitPerMinute =
+
+# cat=pull/throttling/30; type=string; label=Signature tolerance (seconds): Accepted clock drift of signed requests. Inherit = MONITORING_SIGNATURE_TOLERANCE, default 300.
+signatureTolerance =
