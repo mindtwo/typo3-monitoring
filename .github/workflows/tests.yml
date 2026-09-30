@@ -11,12 +11,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        # Pest no longer installs on PHP 8.1; the 8.1 floor (TYPO3 12.4) is covered by the
+        # php81 job below (syntax lint + production dependency resolution) and by PHPStan's
+        # phpVersion 80100.
         php: ['8.2', '8.3', '8.4']
         typo3: ['^12.4', '^13.4']
-        include:
-          # TYPO3 12.4 is the last branch that still runs on PHP 8.1; 13.4 needs 8.2+.
-          - php: '8.1'
-            typo3: '^12.4'
 
     name: PHP ${{ matrix.php }} · TYPO3 ${{ matrix.typo3 }}
 
@@ -35,3 +34,25 @@ jobs:
       - run: composer update --prefer-stable --no-interaction --no-progress
 
       - run: vendor/bin/pest --ci
+
+  php81:
+    runs-on: ubuntu-latest
+    name: PHP 8.1 floor (syntax + production dependencies · TYPO3 ^12.4)
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: curl, json, intl, mbstring
+          coverage: none
+
+      - name: Syntax-check every source file on PHP 8.1
+        run: find Classes Configuration ext_localconf.php -name '*.php' -print0 | xargs -0 -n1 -P4 php -l
+
+      - name: Resolve the production dependencies on PHP 8.1
+        run: |
+          composer require "typo3/cms-core:^12.4" --no-update --no-interaction
+          php -r '$j = json_decode(file_get_contents("composer.json"), true); unset($j["require-dev"]); file_put_contents("composer.json", json_encode($j, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));'
+          composer update --prefer-stable --no-interaction --no-progress --no-dev
